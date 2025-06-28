@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Bulk Messenger with Media</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --whatsapp-green: #25D366;
+            --whatsapp-dark: #075E54;
+            --whatsapp-light: #DCF8C6;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Helvetica, sans-serif;
+        }
+        
+        .container {
+            max-width: 800px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo {
+            color: var(--whatsapp-dark);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .logo i {
+            color: var(--whatsapp-green);
+        }
+        
+        .btn-whatsapp {
+            background-color: var(--whatsapp-green);
+            color: white;
+            font-weight: bold;
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            transition: all 0.3s;
+        }
+        
+        .btn-whatsapp:hover {
+            background-color: var(--whatsapp-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--whatsapp-green);
+            box-shadow: 0 0 0 0.25rem rgba(37, 211, 102, 0.25);
+        }
+        
+        .progress {
+            height: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            background-color: var(--whatsapp-green);
+        }
+        
+        .status-box {
+            background-color: var(--whatsapp-light);
+            border-left: 4px solid var(--whatsapp-green);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .disclaimer {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 30px;
+            font-size: 0.9rem;
+        }
+        
+        .country-code {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        
+        .phone-number {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-left: 0;
+        }
+        
+        .number-preview {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        
+        .media-preview {
+            margin-top: 15px;
+            border: 1px dashed #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .media-preview img, .media-preview video {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: 5px;
+        }
+        
+        .media-preview .file-info {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .media-options {
+            margin-top: 15px;
+        }
+        
+        .media-tabs .nav-link {
+            color: var(--whatsapp-dark);
+        }
+        
+        .media-tabs .nav-link.active {
+            background-color: var(--whatsapp-green);
+            color: white;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fab fa-whatsapp"></i> WhatsApp Bulk Messenger
+            </div>
+            <p class="text-muted">Send messages with media to multiple contacts</p>
+        </div>
+        
+        <form id="messageForm">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="countryCode" class="form-label">Country Code</label>
+                    <select class="form-select country-code" id="countryCode">
+                        <option value="1">United States (+1)</option>
+                        <option value="44">United Kingdom (+44)</option>
+                        <option value="91" selected>India (+91)</option>
+                        <option value="86">China (+86)</option>
+                        <option value="33">France (+33)</option>
+                        <option value="49">Germany (+49)</option>
+                        <option value="55">Brazil (+55)</option>
+                        <option value="81">Japan (+81)</option>
+                        <option value="7">Russia (+7)</option>
+                        <option value="61">Australia (+61)</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="phoneNumbers" class="form-label">Phone Numbers</label>
+                    <textarea class="form-control phone-number" id="phoneNumbers" rows="3" placeholder="Enter phone numbers without country code, separated by commas or new lines"></textarea>
+                </div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="messageText" class="form-label">Your Message</label>
+                <textarea class="form-control" id="messageText" rows="5" placeholder="Type your message here..."></textarea>
+                <div class="form-text">Maximum 1000 characters</div>
+            </div>
+            
+            <!-- Media Attachment Section -->
+            <div class="media-options">
+                <ul class="nav nav-tabs media-tabs" id="mediaTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-tab-pane" type="button" role="tab">Image</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video-tab-pane" type="button" role="tab">Video</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="document-tab" data-bs-toggle="tab" data-bs-target="#document-tab-pane" type="button" role="tab">Document</button>
+                    </li>
+                </ul>
+                
+                <div class="tab-content p-3 border border-top-0 rounded-bottom" id="mediaTabContent">
+                    <div class="tab-pane fade show active" id="image-tab-pane" role="tabpanel" tabindex="0">
+                        <input type="file" class="form-control" id="imageFile" accept="image/*">
+                        <div class="media-preview" id="imagePreview">
+                            <p>No image selected</p>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="video-tab-pane" role="tabpanel" tabindex="0">
+                        <input type="file" class="form-control" id="videoFile" accept="video/*">
+                        <div class="media-preview" id="videoPreview">
+                            <p>No video selected</p>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="document-tab-pane" role="tabpanel" tabindex="0">
+                        <input type="file" class="form-control" id="documentFile" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
+                        <div class="media-preview" id="documentPreview">
+                            <p>No document selected</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label for="delayTime" class="form-label">Delay Between Messages (seconds)</label>
+                    <input type="number" class="form-control" id="delayTime" value="5" min="1" max="60">
+                    <div class="form-text">Recommended: 5-10 seconds</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Preview Numbers</label>
+                    <div class="number-preview" id="numberPreview">
+                        Numbers will appear here...
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2 mb-4">
+                <button type="button" id="sendButton" class="btn btn-whatsapp">
+                    <i class="fas fa-paper-plane"></i> Send Messages
+                </button>
+            </div>
+            
+            <div class="progress" id="progressContainer" style="display: none;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%"></div>
+            </div>
+            
+            <div class="status-box" id="statusBox" style="display: none;">
+                <div class="d-flex justify-content-between">
+                    <strong id="statusText">Preparing to send messages...</strong>
+                    <span id="counter">0/0</span>
+                </div>
+                <div class="mt-2" id="currentNumberText"></div>
+            </div>
+            
+            <div class="disclaimer">
+                <h5><i class="fas fa-exclamation-triangle"></i> Important Notice:</h5>
+                <ul>
+                    <li>This tool will open WhatsApp chats in new tabs/windows</li>
+                    <li>You must manually attach and send media for each message</li>
+                    <li>Use delays to avoid being flagged as spam</li>
+                    <li>Only message people who have consented to receive messages from you</li>
+                    <li>WhatsApp may temporarily ban accounts that send too many messages too quickly</li>
+                </ul>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const countryCodeSelect = document.getElementById('countryCode');
+            const phoneNumbersTextarea = document.getElementById('phoneNumbers');
+            const messageTextarea = document.getElementById('messageText');
+            const delayInput = document.getElementById('delayTime');
+            const sendButton = document.getElementById('sendButton');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const statusBox = document.getElementById('statusBox');
+            const statusText = document.getElementById('statusText');
+            const counter = document.getElementById('counter');
+            const currentNumberText = document.getElementById('currentNumberText');
+            const numberPreview = document.getElementById('numberPreview');
+            
+            // Media elements
+            const imageFile = document.getElementById('imageFile');
+            const videoFile = document.getElementById('videoFile');
+            const documentFile = document.getElementById('documentFile');
+            const imagePreview = document.getElementById('imagePreview');
+            const videoPreview = document.getElementById('videoPreview');
+            const documentPreview = document.getElementById('documentPreview');
+            
+            let selectedMedia = {
+                type: null,
+                file: null,
+                name: null
+            };
+            
+            // Handle media file selection
+            imageFile.addEventListener('change', function(e) {
+                handleMediaSelection(e.target.files[0], 'image');
+            });
+            
+            videoFile.addEventListener('change', function(e) {
+                handleMediaSelection(e.target.files[0], 'video');
+            });
+            
+            documentFile.addEventListener('change', function(e) {
+                handleMediaSelection(e.target.files[0], 'document');
+            });
+            
+            function handleMediaSelection(file, type) {
+                if (!file) return;
+                
+                selectedMedia = {
+                    type: type,
+                    file: file,
+                    name: file.name
+                };
+                
+                // Clear other file inputs
+                if (type !== 'image') imageFile.value = '';
+                if (type !== 'video') videoFile.value = '';
+                if (type !== 'document') documentFile.value = '';
+                
+                // Update preview
+                const previewElement = type === 'image' ? imagePreview : 
+                                     type === 'video' ? videoPreview : documentPreview;
+                
+                if (type === 'image') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewElement.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview" class="img-fluid">
+                            <div class="file-info">${file.name} (${formatFileSize(file.size)})</div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } 
+                else if (type === 'video') {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewElement.innerHTML = `
+                            <video controls class="img-fluid">
+                                <source src="${e.target.result}" type="${file.type}">
+                            </video>
+                            <div class="file-info">${file.name} (${formatFileSize(file.size)})</div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } 
+                else {
+                    previewElement.innerHTML = `
+                        <i class="fas fa-file-alt fa-3x"></i>
+                        <div class="file-info">${file.name} (${formatFileSize(file.size)})</div>
+                    `;
+                }
+                
+                // Clear other previews
+                if (type !== 'image') imagePreview.innerHTML = '<p>No image selected</p>';
+                if (type !== 'video') videoPreview.innerHTML = '<p>No video selected</p>';
+                if (type !== 'document') documentPreview.innerHTML = '<p>No document selected</p>';
+            }
+            
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+            }
+            
+            // Update number preview when inputs change
+            function updateNumberPreview() {
+                const countryCode = countryCodeSelect.value;
+                const numbersText = phoneNumbersTextarea.value;
+                
+                if (!numbersText.trim()) {
+                    numberPreview.textContent = "Numbers will appear here...";
+                    return;
+                }
+                
+                // Split by commas or new lines
+                const numbers = numbersText.split(/[\n,]+/).map(num => num.trim()).filter(num => num);
+                
+                if (numbers.length === 0) {
+                    numberPreview.textContent = "No valid numbers found";
+                    return;
+                }
+                
+                // Display first 5 numbers with country code
+                const previewNumbers = numbers.slice(0, 5).map(num => `+${countryCode} ${num}`);
+                
+                if (numbers.length > 5) {
+                    previewNumbers.push(`...and ${numbers.length - 5} more`);
+                }
+                
+                numberPreview.innerHTML = previewNumbers.join('<br>');
+            }
+            
+            countryCodeSelect.addEventListener('change', updateNumberPreview);
+            phoneNumbersTextarea.addEventListener('input', updateNumberPreview);
+            
+            // Send messages function
+            sendButton.addEventListener('click', function() {
+                const countryCode = countryCodeSelect.value;
+                const numbersText = phoneNumbersTextarea.value;
+                const message = messageTextarea.value.trim();
+                const delaySeconds = parseInt(delayInput.value);
+                
+                if (!message && !selectedMedia.file) {
+                    alert('Please enter a message or attach media');
+                    return;
+                }
+                
+                if (!numbersText.trim()) {
+                    alert('Please enter at least one phone number');
+                    return;
+                }
+                
+                // Split by commas or new lines and clean up
+                let numbers = numbersText.split(/[\n,]+/)
+                    .map(num => num.trim())
+                    .filter(num => num);
+                
+                if (numbers.length === 0) {
+                    alert('No valid phone numbers found');
+                    return;
+                }
+                
+                // Remove duplicates
+                numbers = [...new Set(numbers)];
+                
+                // Add country code
+                const fullNumbers = numbers.map(num => `${countryCode}${num}`);
+                
+                // Encode message for URL
+                const encodedMessage = encodeURIComponent(message);
+                
+                // UI Setup
+                sendButton.disabled = true;
+                progressContainer.style.display = 'block';
+                statusBox.style.display = 'block';
+                progressBar.style.width = '0%';
+                statusText.textContent = 'Preparing to send messages...';
+                counter.textContent = `0/${fullNumbers.length}`;
+                
+                // Process numbers one by one
+                let processed = 0;
+                const total = fullNumbers.length;
+                
+                function processNextNumber() {
+                    if (processed >= total) {
+                        // All done
+                        progressBar.style.width = '100%';
+                        statusText.textContent = 'All messages prepared for sending!';
+                        counter.textContent = `${total}/${total}`;
+                        currentNumberText.textContent = '';
+                        sendButton.disabled = false;
+                        return;
+                    }
+                    
+                    const currentNumber = fullNumbers[processed];
+                    let whatsappUrl = `https://web.whatsapp.com/send?phone=${currentNumber}`;
+                    
+                    if (message) {
+                        whatsappUrl += `&text=${encodedMessage}`;
+                    }
+                    
+                    // Update UI
+                    const progress = Math.round((processed / total) * 100);
+                    progressBar.style.width = `${progress}%`;
+                    counter.textContent = `${processed + 1}/${total}`;
+                    
+                    let statusMessage = `Opening chat with: +${currentNumber}`;
+                    if (selectedMedia.file) {
+                        statusMessage += ` (with ${selectedMedia.type}: ${selectedMedia.name})`;
+                    }
+                    currentNumberText.textContent = statusMessage;
+                    
+                    // Open in new tab
+                    const newWindow = window.open(whatsappUrl, '_blank');
+                    
+                    // Note: Actual media attachment must be done manually due to WhatsApp Web restrictions
+                    
+                    processed++;
+                    
+                    if (processed < total) {
+                        setTimeout(processNextNumber, delaySeconds * 1000);
+                    } else {
+                        processNextNumber(); // To trigger completion
+                    }
+                }
+                
+                // Start processing
+                setTimeout(processNextNumber, 1000);
+            });
+            
+            // Initialize preview
+            updateNumberPreview();
+        });
+    </script>
+</body>
+</html>
